@@ -17,6 +17,7 @@ It is also easily possible to add own custom similarity measures or import exter
 """
 from .CosineGreedy import CosineGreedy
 from .CosineHungarian import CosineHungarian
+from .Fidelity import Fidelity
 from .FingerprintSimilarity import FingerprintSimilarity
 from .IntersectMz import IntersectMz
 from .ModifiedCosine import ModifiedCosine
@@ -27,6 +28,7 @@ from .PrecursorMzMatch import PrecursorMzMatch
 __all__ = [
     "CosineGreedy",
     "CosineHungarian",
+    "Fidelity",
     "FingerprintSimilarity",
     "IntersectMz",
     "ModifiedCosine",
