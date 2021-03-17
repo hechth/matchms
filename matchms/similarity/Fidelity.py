@@ -80,13 +80,17 @@ class Fidelity(BaseSimilarity):
                                       query_peaks,
                                       tolerance=self.tolerance,
                                       shift=0.0)
+
+        # If no matching pairs are found, shortcut and return 0.
         if matching_pairs is None:
             return numpy.asarray((float(0), 0), dtype=self.score_datatype)
 
+        # Compute random variable distributions p and q for reference and query intensities.
         p, q = _compute_p_q_for_matches(matching_pairs,
                                         reference.peaks.intensities,
                                         query.peaks.intensities)
 
+        # Compute score and number of matches
         score = fidelity_score(p, q)
         matches = len(matching_pairs)
 
@@ -95,12 +99,40 @@ class Fidelity(BaseSimilarity):
 
 def _compute_p_q_for_matches(
         matching_pairs: List[Tuple[int, int]],
-        intensities1: numpy.ndarray, intensities2: numpy.ndarray
-) -> (numpy.ndarray, numpy.ndarray):
-    norm_intensities1 = _to_pdf(intensities1)
-    norm_intensities2 = _to_pdf(intensities2)
-    p = norm_intensities1.take([match[0] for match in matching_pairs])
-    q = norm_intensities2.take([match[1] for match in matching_pairs])
+        ref_ints: numpy.array, query_ints: numpy.array
+) -> (numpy.array, numpy.array):
+    """ Compute PDFs for spectra for given matching peaks.
+
+    The fidelity score computes the similarity of two discrete probability distributions P, Q.
+    These are described by probability density functions p(x) and q(x).
+    The event x is the occurence of a peak at a given m/z value,
+    while p(x) and q(x) denote the likelyhood of this event,
+    given by the intensity of the peak.
+    The intensity values of reference and query spectrum are rescaled to sum up to 1 to be used as
+    pdfs.
+
+    Parameters
+    ----------
+    matching_pairs : List[Tuple[int, int]]
+        List of matching peak indices.
+    ref_ints : numpy.array
+        Intensities of peaks in reference spectrum.
+    query_ints : numpy.array
+        Intensities of peaks in query spectrum.
+
+    Returns
+    -------
+    p, q : (numpy.array, numpy.array)
+        Probability density functions of query and reference spectra intensities.
+    """
+
+    # Transform reference and query intensities to probability density functions
+    ref_pdf = _to_pdf(ref_ints)
+    query_pdf = _to_pdf(query_ints)
+
+    # Extract the probabilitites for matching peaks
+    p = ref_pdf.take([match[0] for match in matching_pairs])
+    q = query_pdf.take([match[1] for match in matching_pairs])
     return (p, q)
 
 
