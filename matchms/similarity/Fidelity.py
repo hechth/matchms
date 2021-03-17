@@ -11,7 +11,11 @@ from .BaseSimilarity import BaseSimilarity
 class Fidelity(BaseSimilarity):
     """Calculate 'fidelity distance' between two spectra.
 
-    TODO: Add documentation here.
+    The fidelity score computes the similarity of two discrete probability distributions P, Q.
+    These are described by probability density functions p(x) and q(x).
+    The event x is the occurence of a peak at a given m/z value,
+    while p(x) and q(x) denote the likelyhood of this event,
+    given by the intensity of the peak.
 
     For example
 
@@ -21,10 +25,11 @@ class Fidelity(BaseSimilarity):
         from matchms import Spectrum
         from matchms.similarity import Fidelity
 
-        reference = Spectrum(mz=np.array([100, 150, 200.]),
-                             intensities=np.array([0.7, 0.2, 0.1]))
-        query = Spectrum(mz=np.array([100, 140, 190.]),
-                         intensities=np.array([0.4, 0.2, 0.1]))
+        reference = Spectrum(mz=numpy.array([100, 200, 300, 500, 510], dtype="float"),
+                          intensities=numpy.array([0.1, 0.2, 1.0, 0.3, 0.4], dtype="float"))
+
+        query = Spectrum(mz=numpy.array([100, 200, 290, 490, 510], dtype="float"),
+                          intensities=numpy.array([0.1, 0.2, 1.0, 0.3, 0.4], dtype="float"))
 
         # Use factory to construct a similarity function
         fidelity = Fidelity()
@@ -36,10 +41,9 @@ class Fidelity(BaseSimilarity):
     Should output
 
     .. testoutput::
-
-        TODO: Describe test output.
-
+        Fidelity score is 0.122 with 3 matched peaks.
     """
+
     # Set key characteristics as class attributes
     is_commutative = True
     # Set output data type, e.g. ("score", "float") or [("score", "float"), ("matches", "int")]
@@ -52,11 +56,15 @@ class Fidelity(BaseSimilarity):
         tolerance:
             Peaks will be considered a match when <= tolerance apart. Default is 0.1.
         """
+        
         self.tolerance = tolerance
 
     def pair(self, reference: SpectrumType,
              query: SpectrumType) -> Tuple[float, int]:
-        """Calculate fidelity between two spectra.
+        """Calculate fidelity score and number of matched peaks between two spectra.
+
+        This function computes the matching peaks between the two spectra and
+        computes the fidelity score after transforming the intensities to pdfs.
 
         Parameters
         ----------
@@ -67,7 +75,7 @@ class Fidelity(BaseSimilarity):
 
         Returns
         -------
-        Score
+        Score : Tuple[float, int]
             Tuple with fidelity score and number of matched peaks.
         """
 
@@ -103,11 +111,6 @@ def _compute_p_q_for_matches(
 ) -> (numpy.array, numpy.array):
     """ Compute PDFs for spectra for given matching peaks.
 
-    The fidelity score computes the similarity of two discrete probability distributions P, Q.
-    These are described by probability density functions p(x) and q(x).
-    The event x is the occurence of a peak at a given m/z value,
-    while p(x) and q(x) denote the likelyhood of this event,
-    given by the intensity of the peak.
     The intensity values of reference and query spectrum are rescaled to sum up to 1 to be used as
     pdfs.
 
