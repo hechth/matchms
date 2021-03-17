@@ -4,7 +4,7 @@ from matchms import Spectrum
 from matchms.similarity import Fidelity
 
 
-@pytest.mark.parametrize("tolerance, expected_score, expected_matches", [(0.1, 0.35, 3)])
+@pytest.mark.parametrize("tolerance, expected_score, expected_matches", [(0.1, 0.1225, 3)])
 def test_fidelity(tolerance, expected_score, expected_matches):
     """Compare output fidelity distance with scores computed via daphnis package implementation."""
     spectrum_1 = Spectrum(mz=numpy.array([100, 200, 300, 500, 510], dtype="float"),
