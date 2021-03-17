@@ -118,12 +118,37 @@ def score_best_matches(matching_pairs: numpy.ndarray, spec1: numpy.ndarray,
 
 
 @numba.njit(fastmath=True)
-def bhattacharyya_coefficient(p: numpy.ndarray, q: numpy.ndarray):
+def bhattacharyya_coefficient(p: numpy.array, q: numpy.array):
+    r""" Bhattacharyya coefficient.
+
+    .. math::
+        \sum\sqrt{P_{i}Q_{i}}
+
+    Parameters
+    ----------
+    p : numpy.array
+        The probability distribution function of P.
+    q : numpy.array
+        The probability distribution function of Q.
+    """
+
     score = numpy.sum(numpy.sqrt(p * q))
     return score
 
 
 @numba.njit(fastmath=True)
 def fidelity_score(p: numpy.ndarray, q: numpy.ndarray):
+    r""" Fidelity of Quantum States.
+
+    .. math::
+        (\sum\sqrt{P_{i}Q_{i}})^2
+
+    Parameters
+    ----------
+    p : numpy.array
+        The probability distribution function of P.
+    q : numpy.array
+        The probability distribution function of Q.
+    """
     score = bhattacharyya_coefficient(p, q) ** 2
     return score
