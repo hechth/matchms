@@ -104,6 +104,19 @@ def _compute_p_q_for_matches(
     return (p, q)
 
 
-def _to_pdf(intensities):
-    """ Convert a vector to a pdf, so that all values sum up to 1. """
-    return intensities / intensities.sum()
+def _to_pdf(x: numpy.array) -> numpy.array:
+    """ Convert vector to PDF.
+    Convert a vector to a probability density function (pdf), so that all values sum up to 1.
+
+    Parameters
+    ----------
+    x : numpy.array
+        The values which should be rescaled in order to sum up to 1.
+
+    Returns
+    -------
+    output: numpy.array
+        The rescaled intensities, so that sum(x) = 1.
+    """
+
+    return x / x.sum()
