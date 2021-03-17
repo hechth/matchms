@@ -56,7 +56,7 @@ class Fidelity(BaseSimilarity):
         tolerance:
             Peaks will be considered a match when <= tolerance apart. Default is 0.1.
         """
-        
+
         self.tolerance = tolerance
 
     def pair(self, reference: SpectrumType,
