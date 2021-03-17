@@ -1,9 +1,12 @@
+from typing import List
 from typing import Tuple
 import numpy
-from matchms.similarity.spectrum_similarity_functions import collect_peak_pairs
+from matchms.similarity.spectrum_similarity_functions import find_matches
+from matchms.similarity.spectrum_similarity_functions import fidelity_score
 from matchms.similarity.spectrum_similarity_functions import get_peaks_array
 from matchms.typing import SpectrumType
 from .BaseSimilarity import BaseSimilarity
+
 
 class Fidelity(BaseSimilarity):
     """Calculate 'fidelity distance' between two spectra.
@@ -40,7 +43,7 @@ class Fidelity(BaseSimilarity):
     # Set key characteristics as class attributes
     is_commutative = True
     # Set output data type, e.g. ("score", "float") or [("score", "float"), ("matches", "int")]
-    score_datatype = [("score", numpy.float64), ("matches", "int")]
+    score_datatype = [("score", numpy.float64), ("matches", int)]
 
     def __init__(self, tolerance: float = 0.1):
         """
@@ -51,7 +54,8 @@ class Fidelity(BaseSimilarity):
         """
         self.tolerance = tolerance
 
-    def pair(self, reference: SpectrumType, query: SpectrumType) -> Tuple[float, int]:
+    def pair(self, reference: SpectrumType,
+             query: SpectrumType) -> Tuple[float, int]:
         """Calculate fidelity between two spectra.
 
         Parameters
@@ -66,24 +70,40 @@ class Fidelity(BaseSimilarity):
         Score
             Tuple with fidelity score and number of matched peaks.
         """
-        def get_matching_pairs():
-            """Get pairs of peaks that match within the given tolerance."""
-            matching_pairs = collect_peak_pairs(spec1, spec2, self.tolerance,
-                                                shift=0.0)
-            if matching_pairs is None:
-                return None
-            matching_pairs = matching_pairs[numpy.argsort(matching_pairs[:, 2])[::-1], :]
-            return matching_pairs
 
-        spec1 = get_peaks_array(reference)
-        spec2 = get_peaks_array(query)
-        matching_pairs = get_matching_pairs()
+        # Get m/z and intensity data as arrays
+        ref_peaks = get_peaks_array(reference)
+        query_peaks = get_peaks_array(query)
+
+        # Find matching pairs, since we only compute the matching score using those
+        matching_pairs = find_matches(ref_peaks,
+                                      query_peaks,
+                                      tolerance=self.tolerance,
+                                      shift=0.0)
         if matching_pairs is None:
             return numpy.asarray((float(0), 0), dtype=self.score_datatype)
 
-        def fidelity_score(matching_pairs: numpy.ndarray, spec1: numpy.ndarray, spec2: numpy.ndarray):
-            #TODO: Implementation
-            return 0
+        p, q = _compute_p_q_for_matches(matching_pairs,
+                                        reference.peaks.intensities,
+                                        query.peaks.intensities)
 
-        score = fidelity_score(matching_pairs, spec1, spec2)
-        return numpy.asarray(score, dtype=self.score_datatype)
+        score = fidelity_score(p, q)
+        matches = len(matching_pairs)
+
+        return numpy.asarray((score, matches), dtype=self.score_datatype)
+
+
+def _compute_p_q_for_matches(
+        matching_pairs: List[Tuple[int, int]],
+        intensities1: numpy.ndarray, intensities2: numpy.ndarray
+) -> (numpy.ndarray, numpy.ndarray):
+    norm_intensities1 = _to_pdf(intensities1)
+    norm_intensities2 = _to_pdf(intensities2)
+    p = norm_intensities1.take([match[0] for match in matching_pairs])
+    q = norm_intensities2.take([match[1] for match in matching_pairs])
+    return (p, q)
+
+
+def _to_pdf(intensities):
+    """ Convert a vector to a pdf, so that all values sum up to 1. """
+    return intensities / intensities.sum()
