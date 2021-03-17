@@ -115,3 +115,9 @@ def score_best_matches(matching_pairs: numpy.ndarray, spec1: numpy.ndarray,
 
     score = score/(numpy.sum(spec1_power ** 2) ** 0.5 * numpy.sum(spec2_power ** 2) ** 0.5)
     return score, used_matches
+
+
+@numba.njit(fastmath=True)
+def fidelity_score(p: numpy.ndarray, q: numpy.ndarray):
+    score = numpy.sum(numpy.sqrt(p * q))
+    return score
