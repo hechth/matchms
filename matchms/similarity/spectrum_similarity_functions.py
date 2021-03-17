@@ -118,6 +118,12 @@ def score_best_matches(matching_pairs: numpy.ndarray, spec1: numpy.ndarray,
 
 
 @numba.njit(fastmath=True)
-def fidelity_score(p: numpy.ndarray, q: numpy.ndarray):
+def bhattacharyya_coefficient(p: numpy.ndarray, q: numpy.ndarray):
     score = numpy.sum(numpy.sqrt(p * q))
+    return score
+
+
+@numba.njit(fastmath=True)
+def fidelity_score(p: numpy.ndarray, q: numpy.ndarray):
+    score = bhattacharyya_coefficient(p, q) ** 2
     return score
