@@ -117,7 +117,6 @@ def score_best_matches(matching_pairs: numpy.ndarray, spec1: numpy.ndarray,
     return score, used_matches
 
 
-@numba.njit(fastmath=True)
 def bhattacharyya_coefficient(p: numpy.array, q: numpy.array) -> float:
     r""" Bhattacharyya coefficient.
 
@@ -136,7 +135,6 @@ def bhattacharyya_coefficient(p: numpy.array, q: numpy.array) -> float:
     return score
 
 
-@numba.njit(fastmath=True)
 def fidelity_score(p: numpy.ndarray, q: numpy.ndarray) -> float:
     r""" Fidelity of Quantum States.
 
