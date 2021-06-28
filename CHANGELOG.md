@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.9.1] - 2021-06-16
+
+### Fixed
+
+- Correctly handle charge=0 entries in `add_parent_mass` filter [#236](https://github.com/matchms/matchms/pull/236)
+- Reordered written metadata in MSP export for compatability with MS-FINDER & MS-DIAL [#230](https://github.com/matchms/matchms/pull/230)
+- Update README.rst to fix fstring-quote python example [#226](https://github.com/matchms/matchms/pull/226)
+
+## [0.9.0] - 2021-05-06
+
+### Added
+
+- new `matchms.networking` module which allows to build and export graphs from `scores` objects [#198](https://github.com/matchms/matchms/pull/198)
+- Expand list of known negative ionmode adducts and conversion rules [#213](https://github.com/matchms/matchms/pull/213)
+- `.to_numpy` method for Spikes class which allows to run `spectrum.peaks.to_numpy` [#214](https://github.com/matchms/matchms/issues/214)
+- `save_as_msp()` function to export spectrums to .msp file [#215](https://github.com/matchms/matchms/pull/215)
+
+### Changed
+
+- `add_precursor_mz()` filter now also checks for metadata in keys `precursormz` and `precursor_mass` [#223](https://github.com/matchms/matchms/pull/223)
+- `load_from_msp()` now handles .msp files containing multiple peaks per line separated by `;` [#221](https://github.com/matchms/matchms/pull/221)
+- `add_parent_mass()` now includes `overwrite_existing_entry` option (default is False) [#225](https://github.com/matchms/matchms/pull/225)
+
+### Fixed
+
+- `add_parent_mass()` filter now makes consistent use of cleaned adducts [#225](https://github.com/matchms/matchms/pull/225)
+
 ## [0.8.2] - 2021-03-08
 
 ### Added
@@ -286,7 +313,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - This is the initial version of Spec2Vec from https://github.com/iomega/Spec2Vec
 
-[Unreleased]: https://github.com/matchms/matchms/compare/0.8.2...HEAD
+[Unreleased]: https://github.com/matchms/matchms/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/matchms/matchms/compare/0.9.0...0.9.1
+[0.9.0]: https://github.com/matchms/matchms/compare/0.8.2...0.9.0
 [0.8.2]: https://github.com/matchms/matchms/compare/0.8.1...0.8.2
 [0.8.1]: https://github.com/matchms/matchms/compare/0.8.0...0.8.1
 [0.8.0]: https://github.com/matchms/matchms/compare/0.7.0...0.8.0
